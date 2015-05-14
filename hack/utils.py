@@ -81,14 +81,58 @@ def get_location_by_id(id):
     return ret.json()["response"]
 
 
-if post_location(None) == None:
-    print("Location added")
-else:
-    None
+# if post_location(None) == None:
+#     print("Location added")
+# else:
+#     None
 
-print("Locations:\n" + json.dumps(get_location(), indent=4))
-print("Network devices:\n" + json.dumps(get_network_device(), indent=4))
-#post_network_device_location("a632c6e8-89bf-4949-8e4d-a249105f2c7c", "255f8f86-554f-473f-aa35-ee238ad11c0a")
-print("Location of the device with id: a632c6e8-89bf-4949-8e4d-a249105f2c7c:")
-location_id = get_network_device_location("a632c6e8-89bf-4949-8e4d-a249105f2c7c")
-print(json.dumps(get_location_by_id(location_id), indent=4))
+# print("Locations:\n" + json.dumps(get_location(), indent=4))
+# print("Network devices:\n" + json.dumps(get_network_device(), indent=4))
+# #post_network_device_location("a632c6e8-89bf-4949-8e4d-a249105f2c7c", "255f8f86-554f-473f-aa35-ee238ad11c0a")
+# print("Location of the device with id: a632c6e8-89bf-4949-8e4d-a249105f2c7c:")
+# location_id = get_network_device_location("a632c6e8-89bf-4949-8e4d-a249105f2c7c")
+# print(json.dumps(get_location_by_id(location_id), indent=4))
+
+
+test_json = {
+  "response": [
+    {
+      "id": "ed4c5927-118c-485c-97b3-00390d42c7f1",
+      "civicAddress": "tefdgfds",
+      "geographicalAddress": "Latitude: 2312.312312, Longitude: 31.321312                 degrees",
+      "description": "test",
+      "locationName": "Test"
+    },
+    {
+      "id": "7c1cd09f-f29f-4045-9c46-f14e11899180",
+      "civicAddress": "fsdafds",
+      "geographicalAddress": "Latitude: fdsafds, Longitude: fdsafds                 degrees",
+      "description": "fdsafds",
+      "locationName": "dsadas"
+    }
+  ],
+  "version": "0.0"
+}
+
+
+def coord_list(location_json):
+#   location_json = get_location()
+    c_list = []
+    for item in location_json["response"]:
+        [lat, lon] = item["geographicalAddress"].split(",")
+        lat_value = lat.split(" ")[1]
+        lon_value = lon.split(" ")[2]
+        c_list.append((lat_value, lon_value))
+    return c_list
+
+print(json.dumps(test_json, indent=4))
+print(coord_list(test_json))
+    
+def map_device_location():
+    list_mapping = []
+    ret = requests.get(baseUrl + '/network-device/location', verify=False)
+    for item in ret.json()["response"]:
+        device = requests.get(baseUrl + '/network-device/{}'.format(item["id"]), verify=False)
+        location = requests.get(baseUrl + '/location/{}'.format(item["location"]), verify=False)
+        list_mapping.append((device.json()["response"], location.json()["response"]))
+    return list_mapping
